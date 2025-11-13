@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính Điểm Billiards</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        /* CSS */
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 10px; /* Giảm padding tổng thể */
+            background-color: #fff; 
+        }
+        
+        
+        .shape-outer {
+    display: flex;
+    flex-shrink: 0;
+    height: calc(100px + 4vw);
+    width: calc(100px + 4vw);
+    margin: 25px;
+    background-image: linear-gradient(to bottom right, #ff3cac, #562b7c, #2b86c5);
+    
+}
+
+.shape-inner-DUONG {	
+    height: calc(80px + 4vw);
+    width: calc(80px + 4vw);    
+    background-size: cover;
+    margin: auto;    
+    background-image: url("https://bia.page.gd/img/duong.png");
+ }
+.shape-inner-NINH {	
+    height: calc(80px + 4vw);
+    width: calc(80px + 4vw);    
+    background-size: cover;
+    margin: auto;    
+    background-image: url("https://bia.page.gd/img/ninh.png");
+ }
+.shape-inner-HOANG {	
+    height: calc(80px + 4vw);
+    width: calc(80px + 4vw);    
+    background-size: cover;
+    margin: auto;    
+    background-image: url("https://bia.page.gd/img/hoang.png");
+ }
+.shape-inner-LONG {	
+    height: calc(80px + 4vw);
+    width: calc(80px + 4vw);    
+    background-size: cover;
+    margin: auto;    
+    background-image: url("https://bia.page.gd/img/long.png");
+ }
+
+.shape-inner-HOANGANH {	
+    height: calc(80px + 4vw);
+    width: calc(80px + 4vw);    
+    background-size: cover;
+    margin: auto;    
+    background-image: url("https://bia.page.gd/img/hoanganh.png");
+ }
+ .shape-inner-MINH {	
+    height: calc(80px + 4vw);
+    width: calc(80px + 4vw);    
+    background-size: cover;
+    margin: auto;    
+    background-image: url("https://bia.page.gd/img/minh.png");
+ }
+ .shape-inner-KHANH {	
+    height: calc(80px + 4vw);
+    width: calc(80px + 4vw);    
+    background-size: cover;
+    margin: auto;    
+    background-image: url("https://bia.page.gd/img/khanh.png");
+ }
+        
+ .shape-inner-GIANG {	
+    height: calc(80px + 4vw);
+    width: calc(80px + 4vw);    
+    background-size: cover;
+    margin: auto;    
+    background-image: url("https://bia.page.gd/img/giang.png");
+ }        
+   
+ .shape-inner-GIAP {	
+    height: calc(80px + 4vw);
+    width: calc(80px + 4vw);    
+    background-size: cover;
+    margin: auto;    
+    background-image: url("https://bia.page.gd/img/giap.png");
+ }          
+  
+        
+         .shape-inner-BAN {	
+    height: calc(80px + 4vw);
+    width: calc(80px + 4vw);    
+    background-size: cover;
+    margin: auto;    
+    background-image: url("https://bia.page.gd/img/ban.png");
+ }          
+        
+        
+     .circle {
+   border-radius: 50%; /* Thêm để đảm bảo hình tròn */
+    overflow: hidden; /* Đảm bảo nội dung không tràn ra ngoài */
+}   
+        .avatar-container {
+    display: flex; /* Bật Flexbox */
+    gap: 0px;     /* (Tùy chọn) Thêm khoảng cách giữa các avatar */    
+    justify-content: center;
+}
+
+.banner-nen {
+        background-image: url("https://bia.page.gd/img/1.png");
+        width: 100%;
+        height:1209px;
+         background-size: cover;     /* Đảm bảo ảnh nền lấp đầy khung */
+    background-position: center;     /* Căn giữa ảnh nền */
+    background-repeat: no-repeat;    /* Không lặp lại ảnh nền */
+}
+
+
+.banner-content {    
+    width: 100%;    
+    display: flex; /* Bật Flexbox */
+    justify-content: center; /* Căn giữa theo chiều ngang (trái-phải) */
+    align-items: normal;
+    padding-top: 24%;
+}
+
+.banner-content-l {    
+    width: 100%;
+    height: 0%;
+    display: flex; /* Bật Flexbox */
+    justify-content: center; /* Căn giữa theo chiều ngang (trái-phải) */
+    align-items: center; /* Căn giữa theo chiều dọc (trên-dưới) */
+    padding-top: 17%;
+}
+
+
+
+        .app-container { 
+            
+            margin: 0 auto; 
+            background-color: #fff; 
+            padding: 20px; 
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+            border-radius: 8px;
+           text-align: left;
+        }
+        
+        /* Bố cục điều khiển mặc định (Desktop) */
+        .controls { 
+            display: flex; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 20px; 
+            padding: 10px 0; 
+            border-bottom: 1px solid #ccc; 
+            margin-bottom: 20px; 
+        }
+        .control-group { 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            font-weight: bold; 
+        }
+
+
+
+        
+  
+        
+    </style>
+</head>
+<body>
+
+
+
+    <div class="app-container" id="appContainer">
+        
+        <div class="controls">
+        
+         <div class="container">
+    	<h3>1. Đăng nhập hệ thống</h3>
+    	Chọn tài khoản từ danh sách và nhập mật khẩu để đăng nhập.<br><img src="img/1.png" />
+    	
+    	<h3>2. Đổi mật khẩu</h3>
+    	<p>Chọn tài khoản từ danh sách và nhập mật khẩu cũ và mật khẩu mới để đổi mật khẩu. <b style="color:red">Lưu ý: Cần đổi mật khẩu mặc định (123456) ngay nếu không người khác có mật khẩu sẽ vào xem được bài của mình</b><br><img src="img/2.png" /></p>    	
+    	
+    	<h3>3. Thao tác cơ bản</h3>
+    	Sau khi đăng nhập xong sẽ chuyển sang màn hình chính:
+    	<br/><img src="img/3.png" /><br/>
+    	 Tại màn hình chính có các chức năng như sau: <br>- Click vào nút <b>Xem thống kê kết quả</b> để xem thông tin tổng hợp kết quả trận đấu hiện tại. 
+    	 <br/><img src="img/4.png" />
+    	 <br>- Số to màu trắng là tổng số cây của người chơi tính đến hiện tại.
+    	 <br>- Ở dưới là thứ chơi của ván, phần mềm tự sắp xếp theo kết quả các ván đấu trước đó.
+    	 <br>- Tiếp theo là bảng tổng hợp kết quả theo từng ván đấu theo từng người chơi. Với các số liệu về tổng số cây đến thời điểm hiện tại của từng người chơi. Số ván móm, ù, sẹo, số cây chênh với người đang dẫn đầu.
+    	 <br>- Click lần nữa vào nút <b>Xem thống kê kết quả</b> để thu gọn phần thông tin thống kê.
+    	 
+    	 <br/><img src="img/5.png" />
+    	 <br>- Ô <b>Bi mục tiêu</b> hiển thị danh sách những con bi mà người chơi cần ăn (theo bài của người chơi)
+    	 <br>- Ô <b>Bài của bạn</b> (bên trái) hiển thị danh sách những lá bài của người chơi. Phần mềm tự chia bài mới sau khi kết thúc ván. 
+    	 <br>- Khi ăn Bi xong, click đúp vào lá bài để hạ bài. Lá bài sẽ được chuyển sang ô <b>Cây bạn đã ăn</b> ở ô bên phải. Máy sẽ đọc tên lá bài được hạ. 
+    	 <br>- Nếu hạ nhầm cây thì click đúp vào lá bài ở ô <b>Cây bạn đã ăn</b> thì lá bài sẽ được bốc lên và chuyển về ô <b>Bài của bạn</b>
+    	 <br>- Khi bị sẹo thì click đúp vào Nọc ở ô <b>Bốc sẹo</b>. Phần mềm sẽ tự bốc cho 1 cây bài phù hợp còn trên nọc và đưa vào ô <b>Bài của bạn</b>. Máy sẽ đọc tên lá bài bốc được. Sau mỗi lượt người chơi hạ bài máy sẽ tự tính toán số cây bài ở trong nọc còn có thể bốc. Nếu nọc không còn lá nào mà người chơi sẹo thì xử thua ván đó.
+    	 
+    	 <br/><img src="img/6.png" />
+    	 <br>- Sau mỗi lượt hạ bài của người chơi. Các lá bài nào của các người chơi còn lại bị <b>Thối</b> thì sẽ bị mờ đi và không thể hạ lá bài này được nữa.
+    	   	
+    	
+    	 <br/><img src="img/7.png" />
+    	 <br>- Ở cuối màn hình thể hiện thông tin Số cây của từng người chơi ở ván đang chơi, ù hay móm, số cây chi tiết (phần mềm tự động tính sau mỗi lượt hạ bài của người chơi). 
+    	 <br/><img src="img/8.png" />
+    	 <br>- Dòng tiếp theo Hiển thị các lá bài mà từng người chơi đã ăn. 
+    	 <br>- Dòng cuối cùng (nền đỏ) hiển thị lá các lá bài mà người chơi bị sẹo đã bốc được.    	 
+    	 
+    	 </p>    	
+    	
+    	
+        </div>  
+        
+        	<div style="width:100%; text-align:center" >
+        	<a href="index.php" style="text-decoration:none" >Quay lại trang đăng nhập</a>
+        	</div>
+            </div>
+        </div>
+
+        
+</body>
+</html>
