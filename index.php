@@ -98,6 +98,8 @@ function get_base_url() {
 $domain = get_base_url();
 $seed = floor( time() );
 srand( $seed );
+
+$domain="https://github.com/quantritnmthn/bia/raw/refs/heads/main/";
 ?>
 
 <!DOCTYPE html>
@@ -161,8 +163,9 @@ srand( $seed );
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
-            opacity: 0.6;
+            font-size: 20px;
+            font-weight:bold;
+            opacity: 0.8;
         }
         button:hover {
             background-color: #45a049;
@@ -228,10 +231,37 @@ srand( $seed );
             z-index: -100;
 
             /* Hiệu ứng tối (tùy chọn) để nội dung dễ đọc hơn */
-            filter: brightness(50%);
+            filter: brightness(100%);
         }
 
-        img {opacity: 0.9;}
+        img {opacity: 0.9;  
+         -webkit-animation:spin 1s linear infinite;
+    -moz-animation:spin 1s linear infinite;
+    animation:spin 1s linear infinite;
+         }
+         
+         @-moz-keyframes spin { 
+    100% { -moz-transform: rotate(360deg); } 
+}
+@-webkit-keyframes spin { 
+    100% { -webkit-transform: rotate(360deg); } 
+}
+@keyframes spin { 
+    100% { 
+        -webkit-transform: rotate(360deg); 
+        transform:rotate(360deg); 
+    } 
+}
+
+
+.neon-text {
+    
+    color: #fff;
+    text-shadow: 0 0 5px #ff005e, 0 0 10px #ff005e, 0 0 20px #ff005e, 0 0 40px #ff005e, 0 0 80px #ff005e;
+    
+}
+
+
     </style>
 </head>	
 <body>
@@ -239,7 +269,7 @@ srand( $seed );
 	
 	 <video autoplay loop muted playsinline id="bg-video">
         <!-- THAY ĐỔI ĐƯỜNG DẪN VIDEO CỦA BẠN TẠI ĐÂY -->
-        <source src="<?php echo($domain);?>video/<?php echo(rand(1,15));?>.mp4" type="video/mp4">
+        <source src="<?php echo($domain);?>video/<?php echo(rand(1,60));?>.mp4" type="video/mp4">
         <!-- Fallback cho trình duyệt không hỗ trợ -->
         Trình duyệt của bạn không hỗ trợ thẻ video.
     </video>	
@@ -248,23 +278,24 @@ srand( $seed );
 		
     <div class="container">
     	
-        <h1 id="formTitle">Đăng nhập hệ thống<br>        
+        <h1 id="formTitle" class="neon-text">Đăng nhập hệ thống<br>        
         
         Pool Online<br>
-        <img src="ball/A.png" style="width:5%">        
-        <img src="ball/2.png" style="width:5%">
-        <img src="ball/3.png" style="width:5%">
-        <img src="ball/4.png" style="width:5%">
-        <img src="ball/5.png" style="width:5%">
-        <img src="ball/6.png" style="width:5%">
-        	<img src="ball/7.png" style="width:5%">
-        <img src="ball/8.png" style="width:5%">
-        <img src="ball/9.png" style="width:5%">
-        <img src="ball/10.png" style="width:5%">
-        <img src="ball/J.png" style="width:5%">
-        <img src="ball/Q.png" style="width:5%">
-        <img src="ball/K.png" style="width:5%">  </h1>
-              
+        	
+        <img src="ball/A.png" style="width:5.5%">        
+        <img src="ball/2.png" style="width:5.5%">
+        <img src="ball/3.png" style="width:5.5%">
+        <img src="ball/4.png" style="width:5.5%">
+        <img src="ball/5.png" style="width:5.5%">
+        <img src="ball/6.png" style="width:5.5%">
+        <img src="ball/7.png" style="width:5.5%">
+        <img src="ball/8.png" style="width:5.5%">
+        <img src="ball/9.png" style="width:5.5%">
+        <img src="ball/10.png" style="width:5.5%">
+        <img src="ball/J.png" style="width:5.5%">
+        <img src="ball/Q.png" style="width:5.5%">
+        <img src="ball/K.png" style="width:5.5%">  
+            </h1>
         
         <?php if ($message): ?>
             <p class="message"><?php echo $message; ?></p>

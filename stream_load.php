@@ -241,7 +241,7 @@ while (true) {
         }
     }
     //sleep(1); 
-    usleep(100000);
+    usleep(300000);
 
     if (connection_aborted()) {
         exit();

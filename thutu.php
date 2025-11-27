@@ -19,7 +19,8 @@
         .container {
             max-width: 1000px;
             margin: 0 auto; 
-            padding: 1.5rem; 
+            padding: 1.2rem; 
+            padding-top:10px;
         }
 
         h1 {
@@ -36,11 +37,11 @@
             background-color: #059669; 
             color: white; 
             font-weight: 700; 
-            padding: 0.75rem 1rem; 
+            padding: 0.4rem 0.4rem; 
             border-radius: 0.5rem; 
             transition: background-color 0.2s ease, box-shadow 0.2s ease; 
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); 
-            
+            margin-bottom:7px;
             border: none;
             cursor: pointer;
         }
@@ -59,11 +60,11 @@
         .card-grid {
             /* Responsive Grid: 3 cột trên di động (mặc định) */
             display: grid;
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 1rem; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 10px; 
             max-width: 1000px;
-            margin: 1rem auto;
-            padding: 1rem;
+            margin: 1% auto;
+           
         }
         
         /* Responsive cho màn hình sm trở lên (640px) */
@@ -172,7 +173,7 @@
         const VALUES = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
         const SUITS = ['R', 'C', 'B', 'T']; 
         const FOLDER = 'desk/';
-        const NUM_CARDS = 12; // Số lượng quân bài cần chia
+        const NUM_CARDS = 52; // Số lượng quân bài cần chia
 
         // Phần tử DOM
         const cardsContainer = document.getElementById('cardsContainer');
@@ -297,6 +298,7 @@
 
                 // Gắn sự kiện lật bài
                 card.addEventListener('click', handleCardClick);
+                card.addEventListener('dblclick', handleCardClick);
             });
             
             // 4. Bắt đầu animation chia bài (staggered)
@@ -321,6 +323,7 @@
 
         // Gắn sự kiện cho nút bấm
         generateButton.addEventListener('click', displayCards);
+        
 
         // Hiển thị lần đầu tiên khi tải trang
         window.onload = displayCards;

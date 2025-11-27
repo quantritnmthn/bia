@@ -19,20 +19,15 @@ header("Allow: GET, POST, OPTIONS, PUT, DELETE");
 <link rel="manifest" href="webmanifest.json">
 <style>
 html, body {
-    font-family: Arial, sans-serif;
-    padding: 10px;
-    background-color: #fff;
-    margin: 0;
-    height: 100%;
+    font-family: Arial, sans-serif;    
+    background-color: #fff;    
     display: flex;
     flex-direction: column; /* Xếp các phần tử theo chiều dọc */
-    min-height: 100dvh;
-    min-height: -webkit-fill-available;
-     height: -webkit-fill-available;
+    
 }
 .table-container {
     overflow-x: auto;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
     position: relative;
 }
 #resultTable {
@@ -149,7 +144,7 @@ background-color: yellow;
 /* Responsive adjustments */
 @media (max-width: 768px) {
 body {
-    padding: 5px;
+    padding: 0px;
 }
 #resultTable {
     min-width: 100%;
@@ -252,7 +247,7 @@ body {
 }
 #baiCuaBan, #cayDaAn {
     width: 50%;
-    background-color: #f9f9f9;
+    background-color: #fff;
 }
 #biMucTieuTable td {
     vertical-align: top;
@@ -282,10 +277,10 @@ body {
 .deskcard {
     cursor: pointer;
     width: 46%;
-    margin: 2px;
+    margin: 3px;
     transition: opacity 0.3s ease, transform 0.3s ease;
-    border-radius: 3px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 .nutbocnoc {
     cursor: pointer;
@@ -294,7 +289,7 @@ body {
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 .deskcard:hover, .nutbocnoc:hover {
-    transform: scale(1.20);
+    transform: scale(1.15);
 }
 .deskcard.disabled {
     pointer-events: none;
@@ -419,6 +414,53 @@ body {
 
 
 .cardthoi {width:22%; margin:3px}
+
+
+.box {
+  --border-angle: 0deg;
+  border-radius: 12px;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 2px 4px hsl(0 0% 0% / 25%);
+  animation: border-angle-rotate 2s infinite linear;
+  border: 0.5rem solid transparent;
+  position: relative;
+
+  &.a {
+    background: linear-gradient(white, white) padding-box,
+      conic-gradient(
+          from var(--border-angle),
+          oklch(100% 100% 0deg),
+          oklch(100% 100% 45deg),
+          oklch(100% 100% 90deg),
+          oklch(100% 100% 135deg),
+          oklch(100% 100% 180deg),
+          oklch(100% 100% 225deg),
+          oklch(100% 100% 270deg),
+          oklch(100% 100% 315deg),
+          oklch(100% 100% 360deg)
+        )
+        border-box;
+  } 
+}
+
+@keyframes border-angle-rotate {
+  from { --border-angle: 0deg; }
+  to { --border-angle: 360deg; }
+}
+
+
+
+
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
 
   
 
@@ -553,7 +595,7 @@ if ( $CheckQuyen == 0 ) {
 <div id="DeskDiv"  style="<?php if ($CheckQuyen==3) echo("display:none");  if ($CheckQuyen==2) echo("display:block");  ?>">
   <table id="biMucTieuTable" border="1" style="width:100%; margin-bottom:20px;">
     <tr>
-      <th style="width:50%">Bi mục tiêu</th>
+      <th style="width:50%;  line-height: 10px;">Bi mục tiêu<br><span style="font-size:8px; color:#126262">(Ấn vào bi để thay loại bi)</span></th>
       <th style="width:50%">Bốc sẹo</th>
     </tr>
     <tr>
@@ -586,9 +628,14 @@ if ( $CheckQuyen == 0 ) {
 <script>
 	
 	
+	let ballext=localStorage.getItem("ballext");
+	if (ballext==null) ballext=".png";
+	var ssedata=null;
+	
 	$.fn.isInViewport = function() {
     var element = $(this);
     var viewport = $(window);
+    
 
     var elementTop = element.offset().top;
     var elementBottom = elementTop + element.outerHeight();
@@ -601,7 +648,7 @@ if ( $CheckQuyen == 0 ) {
 };
 
 // Example usage:
-$(window).on('scroll resize load', function() {
+$(window).on('scroll resize', function() {
 	
 	
     if ($('#eatenTable').isInViewport()) {
@@ -613,7 +660,7 @@ $(window).on('scroll resize load', function() {
 		});
 			
     } else {
-        console.log($(window).height());
+    
         $("#eatenTable thead").css({
         	"position": "fixed",  			
         	"width": $("#eatenTable").width() + "px",	
@@ -639,7 +686,19 @@ $(window).on('scroll resize load', function() {
             $("#ScoreDiv").toggle(); 
             if($('#ScoreDiv').is(':visible')) { $("#ViewScore").html('Ẩn bảng thống kê');} else { $("#ViewScore").html('Kết quả <?php echo($TenNguoiChoi);?>');}
         });
+        
+         
+         $('#BiMucTieu').on('click', function() {
+         	 
+         	ballext = localStorage.getItem("ballext"); 
+          if (ballext==".png") ballext=".jpg"; else ballext=".png";    
+          localStorage.setItem("ballext", ballext);
+                  handleDeskData(ssedata); 
+         });
+        
     });
+    
+    
     
     
     /**
@@ -688,6 +747,7 @@ $(window).on('scroll resize load', function() {
         try {
             // Bước 1: Parse JSON tổng thể từ SSE stream
             combinedData = JSON.parse(response);
+            handleSseData
         } catch (e) {
             console.error("Lỗi parse JSON tổng thể từ SSE:", e);
             return;
@@ -711,6 +771,7 @@ $(window).on('scroll resize load', function() {
         // DÒNG MỚI: GỌI HÀM XỬ LÝ DỮ LIỆU BÀN/BÀI
         if (Object.keys(deskData).length > 0) {
             handleDeskData(deskData); 
+            ssedata=deskData;
         }
 
         let data;
@@ -998,7 +1059,7 @@ const cauKhenDeuNguoiThuaCuoc = [
         const fileName = card; 
 
         // Tạo thẻ <img> với đường dẫn và class "ball"
-        htmlOutput += `<img src="ball/${fileName}.png" class="ballan" alt="${card}">`;
+        htmlOutput += `<img src="ball/${fileName}${ballext}" class="ballan" alt="${card}">`;
     });
 
     return htmlOutput;
@@ -1038,6 +1099,9 @@ const cauKhenDeuNguoiThuaCuoc = [
     
     $(document).ready(function() {
         const savedID = localStorage.getItem(storageKey);
+        
+        
+        
         if (savedID) {
         	<?php
         	if ($CheckQuyen==2)	echo ("currentPlayer = '".$NguoiChoi."';");
@@ -1128,7 +1192,8 @@ const cauKhenDeuNguoiThuaCuoc = [
         }
         
         if (an) {
-            $('#cayDaAn').html(generateCardImages(an));
+        	let strhtml=generateCardImages(an) + "<br/>" + Get_BiMucTieu(an);
+            $('#cayDaAn').html(strhtml);
         } else {
             $('#cayDaAn').html('');
         }
@@ -1649,23 +1714,7 @@ const khen = [
     });
     
     
-    function speakText(van) {
-  const text = van;
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'vi-VN';
-
-  speechSynthesis.getVoices().forEach(voice => {
-    console.log(voice.name, voice.lang);
-    // Thử tìm một giọng có tên hoặc ngôn ngữ gợi ý là nữ
-    if (voice.lang === 'vi-VN' && voice.name.toLowerCase().includes('female')) {
-      utterance.voice = voice;
-    }
-  });
-
-  speechSynthesis.speak(utterance);
-}
-
-    
+       
     
     $(document).on('dblclick', '#cayDaAn .deskcard', function() {
         const $img = $(this);
@@ -1787,7 +1836,7 @@ const khen = [
 
   // 6. Chuyển mảng các mã thành chuỗi HTML
   const chuoiHtml = mangDuyNhat.map(ma => {
-    return `<img class="poolball" src="ball/${ma}.png" />`;
+    return `<img class="poolball" src="ball/${ma}${ballext}" />`;
   }).join(""); 
    
   return chuoiHtml;
@@ -1899,11 +1948,25 @@ function startCountdown() {
 
 startCountdown();
 
-
+    
+    
+$(window).on("load", function() {
+  // Code here will execute after the entire page,
+  // including all images, iframes, and other resources, has finished loading.
+ $("#eatenTable thead").css({
+        	"position": "fixed",  			
+        	"width": $("#eatenTable").width() + "px",	
+  			"top": 100 - ( ($("#eatenHeader").height() / $(window).height() * 100) ) + "dvh"	
+		});
+});    
+    
 
 </script>
 
 <script src="https://code.responsivevoice.org/responsivevoice.js?key=huMVBb4I"></script>
+
+
+
 
 </body>
 </html>

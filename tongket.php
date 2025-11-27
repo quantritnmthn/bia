@@ -32,6 +32,7 @@ $ban=1;
 if ( isset( $_GET["b"] ) ) $ban=$_GET["b"];
 
 $domain = get_base_url();
+//$domain="https://github.com/quantritnmthn/bia/raw/refs/heads/main/";
 $seed = floor( time() );
 srand( $seed );
 
@@ -49,6 +50,9 @@ $pdo->exec( "CREATE TABLE IF NOT EXISTS billiards_data (
     id INT AUTO_INCREMENT PRIMARY KEY,
     data_json TEXT NOT NULL
 )" );
+
+
+$selected_tratien = isset($_GET['tratien']) ? $_GET['tratien'] : '';
 
 // For simplicity, assume single record with id=1
 $stmt = $pdo->prepare( "SELECT COUNT(*) FROM billiards_data WHERE id=1" );
@@ -71,7 +75,7 @@ if ( $stmt->fetchColumn() == 0 ) {
 <script src="js/chart.js"></script> 
 <script src="js/label.js"></script> 
 <script src="js/html2canvas.min.js"></script> 
-<script src="<?php echo($domain);?>js/jquery-3.7.1.min.js" ></script> 
+<script src="js/jquery-3.7.1.min.js" ></script> 
 <script src="js/jquery-ui.min.js" ></script>
 <style>
 /* CSS */
@@ -512,16 +516,197 @@ body {
     width: 30px;
     margin-right: 3px
 }
+
+.chuyentien {
+    /* 1. Đảm bảo các khối nằm cùng một hàng và chỉ xuống dòng khi hết chỗ */
+    display: inline-block; 
+
+    /* 2. Đặt độ rộng là 20% của container chứa nó */
+    width:25%;
+    
+    /* 3. Căn giữa nội dung văn bản và hình ảnh (img) bên trong div */
+    text-align: center; 
+    
+    /* Tùy chọn: Thêm một chút padding và margin để tách biệt các div */
+    padding: 10px;
+    margin-right: 40px;
+    background-color:#fff;
+    
+    /* Tùy chọn: Dễ nhìn hơn khi kiểm tra */
+    border: 1px solid #ddd;
+    box-sizing: border-box; /* Đảm bảo padding và border không làm tăng độ rộng 20% */
+}
+
+
 </style>
 </head>
 <body>
+	
+	<script>
+		  function redirectWithTratien(dropdownElement) {    
+                const selectedValue = dropdownElement.value;
+                const url = new URL(window.location.href);
+                url.searchParams.set('tratien', selectedValue);
+                window.location.href = url.toString();
+          }
+          
+          
+          
+                          
+                <?php
+
+global $host, $dbname, $username, $password;
+
+$conn = new mysqli($host, $username, $password, $dbname);
+$playerData = []; // Khởi tạo mảng chứa dữ liệu
+
+if (!$conn->connect_error) {
+    // Chỉ lấy các cột cần thiết: id, Ten và bank
+    $sql = "SELECT id, Ten, bank FROM billiards_users";
+    $result = $conn->query($sql);
+
+    if ($result && $result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            // Sử dụng ID làm key để JavaScript tra cứu nhanh O(1)
+            $playerData[$row['id']] = [
+                'Ten' => $row['Ten'],
+                'bank' => $row['bank']
+            ];
+        }
+    }
+    $conn->close();
+}
+
+?>
+
+
+    const billiardsUsersData = <?php echo json_encode($playerData); ?>;
+
+                
+                
+                
+                
+                
+/**
+ * Sinh mã QR chuyển tiền, chuỗi HTML và nút tải ảnh.
+ * Dữ liệu người chơi được tra cứu từ biến global `billiardsUsersData`.
+ * * @param {number} chuyencho ID của người nhận tiền.
+ * @param {string} tennguoichuyen Tên người chuyển tiền.
+ * @param {number} sotien Số tiền cần chuyển (không định dạng).
+ * @returns {string} Chuỗi HTML chứa DIV, Mã QR và Nút Tải Ảnh.
+ */
+function TaoQRChiaTien(chuyencho, tennguoichuyen, sotien) {
+    const recipient = billiardsUsersData[chuyencho];
+    
+    if (!recipient) {
+        console.error(`Lỗi: Không tìm thấy người chơi có ID ${chuyencho} trong dữ liệu đã tải.`);
+        return "";
+    }
+
+    const tenNguoiNhan = recipient.Ten;
+
+    // 1. Kiểm tra điều kiện tự chuyển
+    if (tennguoichuyen === tenNguoiNhan) {
+        return "";
+    }
+
+    const bankTemplate = recipient.bank;
+    const sotienFormatted = new Intl.NumberFormat('vi-VN').format(sotien);
+    const qrUrl = bankTemplate.replace("SOTIEN", parseInt(sotien));
+
+    // 2. TẠO ID DUY NHẤT cho DIV để html2canvas có thể nhắm mục tiêu
+    // Sử dụng ID và số tiền để đảm bảo tính duy nhất
+    const divId = `qr-transfer-div-${chuyencho}-${sotien}`; 
+    const fileName = `QR-chuyen-tien-${tenNguoiNhan.replace(/\s/g, '_')}`; // Tên file cho tiện lợi
+
+    // 3. Sinh chuỗi HTML chứa cả DIV và NÚT TẢI 
+    const htmlOutput = `
+        <div class='chuyentien' id='${divId}'>
+            <b>${tennguoichuyen}</b> cần chuyển cho <b>${tenNguoiNhan}</b> số tiền là <b>${sotienFormatted}</b> VNĐ. <br><b>${tennguoichuyen}</b> quét mã QR dưới đây để chuyển tiền:
+            <br><br>
+            <img src='${qrUrl}' style="width:100%" alt='Mã QR chuyển tiền cho ${tenNguoiNhan}' />
+            	
+         <br>   	
+         <button class="download-btn" onclick="downloadQRImage('${divId}', '${fileName}')">
+            Tải ảnh QR
+         </button>
+            	
+        </div>
+        	
+        
+        
+    `;
+
+    return htmlOutput.trim(); 
+}
+
+
+function downloadQRImage(divId, fileNameBase) {
+    const element = document.getElementById(divId);
+    
+    if (!element) {
+        alert("Lỗi: Không tìm thấy nội dung để tải ảnh.");
+        return;
+    }
+     $(".download-btn").hide();
+    // Sử dụng html2canvas
+    html2canvas(element, {
+        allowTaint: true, // Cho phép xử lý ảnh từ domain khác (nếu QR là ảnh ngoài)
+        useCORS: true,   // Bật CORS (rất quan trọng cho hình ảnh bên ngoài)
+        scale: 2,        // Tăng chất lượng ảnh chụp (2x)
+        backgroundColor: '#ffffff' // Đặt nền trắng cho ảnh nếu DIV không có nền rõ ràng
+    }).then(canvas => {
+        // 1. Chuyển canvas thành URL dữ liệu (PNG)
+        const imageURL = canvas.toDataURL('image/png');
+
+        // 2. Tạo một thẻ <a> ẩn để kích hoạt quá trình tải về
+        const link = document.createElement('a');
+        
+        link.download = `${fileNameBase}.png`; // Thiết lập tên file
+        link.href = imageURL;                   // Thiết lập dữ liệu ảnh
+        
+        // 3. Kích hoạt click và xóa thẻ <a>
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        console.log(`Đã tải file: ${link.download}`);
+        $(".download-btn").show();
+    }).catch(error => {
+        console.error("Lỗi khi tạo ảnh với html2canvas:", error);
+        alert("Lỗi: Không thể tải ảnh. Vui lòng kiểm tra console.");
+    });
+} 
+          
+	</script>
+	
 <div class="app-container" id="appContainer">
   <div class="controls">
     <button class="action-button export-btn" id="exportButton">Kết xuất ra ảnh PNG</button>
     <button class="action-button" id="exportHtmlButton" style="background-color: #182db6;">Kết xuất ra HTML</button>
-    <div class="control-group" style="display:none">
+    
+    
+      <div class="control-group">
+      <label for="NguoiTraTien">Người trả tiền bàn:</label>
+      <select id="NguoiTraTien"  onchange="redirectWithTratien(this)" style="padding: 5px; border: 1px solid #ccc; width: 150px; text-align: left;" >
+        <option value="0"><< Lựa chọn >></option>
+        <option value="1">Dương</option>
+        <option value="2">Hoàng</option>
+        <option value="3">Ninh</option>
+        <option value="4">Khánh</option>
+        <option value="5">Minh</option>
+        <option value="6">Hoàng Anh</option>
+        <option value="7">Bản</option>
+        <option value="8">Giang</option>
+        <option value="9">Giáp</option>
+        
+      </select>
+    </div>
+    
+    
+    <div class="control-group" style="display:no1ne">
       <label for="moneyInput">Tiền bàn (đ):</label>
-      <input type="number" id="moneyInput" value="0" min="0">
+      <input type="number" id="moneyInput" value="0" min="0" readonly>
     </div>
     <div class="control-group"  style="display:none">
       <label for="splitCountInput">Số người chia tiền:</label>
@@ -668,6 +853,9 @@ $("#scoreTable").click(function() {
   $(".dongbong").toggle();
 });
          
+          
+          
+        
           
             // 2. Hàm Tải Dữ liệu từ Database via AJAX
             function loadDataFromDatabase(callback) {
@@ -1874,6 +2062,7 @@ function taoKhungAvatar(danhSachTen) {
                     });
                 });
                 
+   
                 // 1. Dữ liệu Cơ Bản
                 const totalPlayers = allPlayers.length;
                 const playersNames = allPlayers.map(p => p.name);
@@ -2206,10 +2395,71 @@ playersData.forEach(p => {
                 if (playersData.length > 1) {
                     const gapLeaderLast = playersData[playersData.length - 1].cays - champion.cays;
                     const avgGap = playersData.reduce((sum, p, idx) => idx > 0 ? sum + (p.cays - playersData[idx-1].cays) : sum, 0) / (playersData.length - 1);
-                    summaryHTML += `<p>• <b>Khoảng cách điểm giữa các hạng:</b> Chênh lệch giữa vô địch và hạng chót là <span class="summary-data-cays">${gapLeaderLast}</span> cây, với khoảng cách trung bình giữa các hạng là <span class="summary-data-cays">${avgGap.toFixed(1)}</span> cây. </p>`;
+                    summaryHTML += `<p>• <b>Khoảng cách điểm giữa các hạng:</b> Chênh lệch giữa vô địch và hạng chót là <span class="summary-data-cays">${gapLeaderLast}</span> cây.</p>`;
                 }
+                // Thông tin chia tiền
+                <?php
+                	
+function GetTenNguoiChoi(int $idnguoichoi): string {
+    global $host, $dbname, $username, $password;
+    $conn = new mysqli($host, $username, $password, $dbname);
+    if ($conn->connect_error) {
+        error_log("Lỗi kết nối CSDL: " . $conn->connect_error);
+        return "Lỗi kết nối CSDL.";
+    }
+    $sql = "SELECT Ten FROM billiards_users WHERE id = ?";
+    if ($stmt = $conn->prepare($sql)) {
+        $stmt->bind_param("i", $idnguoichoi);
+        $stmt->execute();
+        $stmt->bind_result($tenNguoiChoi);
+        if ($stmt->fetch()) {
+            $stmt->close();
+            $conn->close();
+            return $tenNguoiChoi;
+        } else {
+            $stmt->close();
+            $conn->close();
+            return "Người chơi ID $idnguoichoi không tồn tại.";
+        }
+    } else {
+        error_log("Lỗi Prepare Statement: " . $conn->error);
+        $conn->close();
+        return "Lỗi truy vấn dữ liệu.";
+    }
+}
 
-             
+
+                	
+                	
+                if ($selected_tratien!="" && $selected_tratien!="0")
+                {
+                	$nguoitratien = GetTenNguoiChoi($selected_tratien);
+                ?>
+                  
+                  summaryHTML += `<h3>THÔNG TIN CHIA TIỀN</h3>`;
+                  summaryHTML += `<p>• <b><?php echo($nguoitratien);?></b> đã trả tiền bàn là <span class="summary-data-money">${moneyPerGame.toLocaleString('vi-VN')} đồng</span>. Đề nghị anh em còn lại quét mã QR, chuyển tiền cho <b><?php echo($nguoitratien);?></b> với thông tin như sau:</p>`;
+                  
+                  summaryHTML += `<div style="text-align: center; width:100%">`;
+                    playersData.forEach((p) => {
+                    if (completedGames === 0 && p.cays === 0) return; // Bỏ qua người chơi không có điểm                    
+                    
+                    if (p.money > 0) {
+                        summaryHTML += `${TaoQRChiaTien(<?php echo($selected_tratien);?>, p.name, p.money)}`;
+                    } else if (p.cays > 0) {
+                        summaryHTML += ``;
+                    }
+                    
+                });
+                  
+                summaryHTML += `</div>`;  
+                  
+                  
+                  
+                <?php
+                }	
+                ?>                  
+                  
+                              
                 document.getElementById('matchSummaryDetails').innerHTML = summaryHTML;
             }
 
@@ -2507,8 +2757,7 @@ function hideEmptyGameColumns(tableId) {
         } 
         
         
-        
-        
+        $("#NguoiTraTien").val(<?php echo $selected_tratien; ?>);
         
         
         
